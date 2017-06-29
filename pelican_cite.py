@@ -111,6 +111,7 @@ def process_content(article):
     # Get the data for the required citations and append to content
     labels = {}
     content += '<hr>\n<h2>Bibliography</h2>\n'
+    content += '<ol class="bib">\n'
     for formatted_entry in formatted_entries:
         key = formatted_entry.key
         ref_id = key.replace(' ','')
@@ -121,7 +122,7 @@ def process_content(article):
         t = t.replace('\\}', '&#125;')
         t = t.replace('{', '')
         t = t.replace('}', '')
-        text = ("<p id='" + ref_id + "'>" + t)
+        text = ("<li id='" + ref_id + "'>" + t)
         for i in range(cite_count[key]):
             if i == 0:
                 text += ' ' + JUMP_BACK.format(ref_id,1,'↩')
@@ -129,9 +130,10 @@ def process_content(article):
                     text += JUMP_BACK.format(ref_id,1,' <sup>1</sup> ')
             else:
                 text += JUMP_BACK.format(ref_id,i+1,'<sup>'+str(i+1)+'</sup> ')
-        text += '</p>'
+        text += '</li>'
         content += text + '\n'
         labels[key] = label
+    content += '</ol>'
 
     # Replace citations in article/page
     cite_count = {}

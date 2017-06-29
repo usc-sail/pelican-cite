@@ -66,11 +66,13 @@ class LabelStyle(BaseLabelStyle):
             labels[i] = labels[i].replace('}', '')
         count = Counter(labels)
         counted = Counter()
-        for label in labels:
+        for index,label in enumerate(labels):
             if count[label]:
-                yield '(' + label + ')'
+                yield '[' + str(index+1) + ']'
+                #yield '(' + label + ')'
             else:
-                yield '(' + label + chr(ord('a') + counted[label]) + ')'
+                yield '[' + str(index+1) + ']'
+                #yield '[' + label + chr(ord('a') + counted[label]) + ']'
                 counted.update([label])
 
     # note: this currently closely follows the alpha.bst code
