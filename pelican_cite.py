@@ -12,6 +12,7 @@ Based on teh Pelican BibTeX plugin written by Vlad Niculae <vlad@vene.ro>
 import logging
 import re
 import sys
+import os
 
 try:
     from pybtex.database.input.bibtex import Parser
@@ -54,6 +55,7 @@ class Style(UnsrtStyle):
 
 logger = logging.getLogger(__name__)
 global_bib = None
+content_path = None
 if pyb_imported:
     style = Style()
     backend = html.Backend()
@@ -68,6 +70,7 @@ def get_bib_file(article):
     """
     if 'publications_src' in article.metadata:
         refs_file = article.metadata['publications_src']
+	refs_file = os.path.join(content_path, refs_file)
         try:
             local_bib = Parser().parse_file(refs_file)
             return local_bib
@@ -162,18 +165,25 @@ def process_content(article):
 
 def add_citations(generators):
     global global_bib
+    global content_path
     if not pyb_imported:
         logger.warn('`pelican-cite` failed to load dependency `pybtex`')
         return
 
     if 'PUBLICATIONS_SRC' in generators[0].settings:
         refs_file = generators[0].settings['PUBLICATIONS_SRC']
+	refs_file = os.path.join(content_path, refs_file)
         try:
             global_bib = Parser().parse_file(refs_file)
         except PybtexError as e:
             logger.warn('`pelican_bibtex` failed to parse file %s: %s' % (
                 refs_file,
                 str(e)))
+
+    if 'PATH' in generators[0].settings:
+        content_path = generators[0].settings['PATH']
+    else:
+        logger.warn('`pelican-cite` failed to obtain content path')
 
     # Process the articles and pages
     for generator in generators:
